@@ -1,0 +1,100 @@
+openapi: 3.0.1
+
+info:
+  title: Job serf API
+  version: 1.0.0
+
+servers:
+  - url: /
+    description: localhost
+
+paths:
+  /{product}/clients:
+    post:
+      security:
+        - HubApiKeyAuth: []
+      summary: Create new client
+      tags:
+        - Client
+      operationId: createClient
+      parameters:
+        - $ref: '#/components/parameters/product'
+      requestBody:
+        $ref: '#/components/requestBodies/newClient'
+      responses:
+        201:
+          $ref: '#/components/responses/client'
+        400:
+          $ref: '#/components/responses/error'
+        409:
+          $ref: '#/components/responses/error'
+        500:
+          $ref: '#/components/responses/error'
+
+components:
+  schemas:
+    uuid:
+      type: string
+      format: uuid
+
+    email:
+      type: string
+      format: email
+
+    url:
+      type: string
+
+    region:
+      type: string
+      format: region
+      minLength: 2
+      maxLength: 5
+
+  parameters:
+    clientID:
+      name: clientID
+      in: path
+      schema:
+        $ref: '#/components/schemas/uuid'
+      required: true
+
+    region:
+      name: region
+      in: path
+      schema:
+        $ref: '#/components/schemas/region'
+      required: true
+
+  requestBodies:
+    newClient:
+      description: Create new client
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                $ref: '#/components/schemas/name'
+            required:
+              - name
+            additionalProperties: false
+
+  responses:
+    client:
+      description: Client entity
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ID:
+                $ref: '#/components/schemas/uuid'
+              created:
+                $ref: '#/components/schemas/timestamp'
+              updated:
+                $ref: '#/components/schemas/timestamp'
+            required:
+              - ID
+              - created
+              - updated
+            additionalProperties: false
