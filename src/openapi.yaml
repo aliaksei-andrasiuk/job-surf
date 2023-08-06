@@ -9,24 +9,20 @@ servers:
     description: localhost
 
 paths:
-  /{product}/clients:
+  /set-up-search-config:
     post:
       security:
         - HubApiKeyAuth: []
-      summary: Create new client
+      summary: Set up search config
       tags:
-        - Client
-      operationId: createClient
-      parameters:
-        - $ref: '#/components/parameters/product'
+        - SearchConfig
+      operationId: createSearchConfig
       requestBody:
-        $ref: '#/components/requestBodies/newClient'
+        $ref: '#/components/requestBodies/newConfig'
       responses:
         201:
-          $ref: '#/components/responses/client'
+          $ref: '#/components/responses/genericResponse'
         400:
-          $ref: '#/components/responses/error'
-        409:
           $ref: '#/components/responses/error'
         500:
           $ref: '#/components/responses/error'
@@ -44,11 +40,35 @@ components:
     url:
       type: string
 
-    region:
+    searchString:
       type: string
-      format: region
-      minLength: 2
-      maxLength: 5
+      minLength: 0
+      maxLength: 128
+
+    category:
+      type: string
+      enum:
+        - javascript
+        - ux
+
+    seniority:
+      type: string
+      enum:
+        - senior
+        - mid
+        - junior
+        - expert
+
+    seniorityArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/seniority'
+
+    companyRating:
+      type: number
+      format: float
+      minimum: 1
+      maximum: 5
 
   parameters:
     clientID:
@@ -58,43 +78,62 @@ components:
         $ref: '#/components/schemas/uuid'
       required: true
 
-    region:
-      name: region
-      in: path
-      schema:
-        $ref: '#/components/schemas/region'
-      required: true
-
   requestBodies:
-    newClient:
+    newConfig:
       description: Create new client
       content:
         application/json:
           schema:
             type: object
             properties:
-              name:
-                $ref: '#/components/schemas/name'
+              searchString:
+                $ref: '#/components/schemas/searchString'
+              category:
+                $ref: '#/components/schemas/category'
+              seniority:
+                $ref: '#/components/schemas/seniorityArray'
+              companyRating:
+                $ref: '#/components/schemas/companyRating'
             required:
-              - name
+              - category
+              - seniority
+              - companyRating
             additionalProperties: false
 
   responses:
-    client:
-      description: Client entity
+    genericResponse:
+      description: Generic successful response
       content:
         application/json:
           schema:
             type: object
             properties:
-              ID:
-                $ref: '#/components/schemas/uuid'
-              created:
-                $ref: '#/components/schemas/timestamp'
-              updated:
-                $ref: '#/components/schemas/timestamp'
+              status:
+                type: integer
+                format: int32
+              message:
+                type: string
+                maxLength: 1024
             required:
-              - ID
-              - created
-              - updated
+              - status
+              - message
+            additionalProperties: false
+    error:
+      description: Generic error response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                format: int32
+              message:
+                type: string
+                maxLength: 1024
+              data:
+                type: object
+            required:
+              - status
+              - message
             additionalProperties: false

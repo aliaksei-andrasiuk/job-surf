@@ -1,12 +1,15 @@
 import { RequestHandler } from 'express';
 
-import * as clientController from '../controllers/client.controller';
+import * as searchConfigController from '../controllers/searchConfig.controller';
 
-export const createClient: RequestHandler = async (_req, res, next) => {
+export const createSearchConfig: RequestHandler = async (req, res, next) => {
     try {
-        const client = await clientController.createClient();
+        await searchConfigController.createSearchConfig(req.body);
 
-        res.status(201).json(client);
+        res.status(201).json({
+            status: 201,
+            message: 'ok bratan, vse good'
+        });
     } catch (error) {
         next(error);
     }

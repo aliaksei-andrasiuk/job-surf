@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import * as http from 'http';
 import { createHttpTerminator, HttpTerminator } from 'http-terminator';
 import nocache from 'nocache';
+import mongoose from 'mongoose';
 
 import getOpenAPIMiddleware from './middlewares/getOpenAPIMiddleware';
 import loggerContext from './middlewares/loggerContext.middleware';
@@ -24,10 +25,24 @@ export class App {
     constructor({ environment }: { environment?: string }) {
         assert(environment, 'ENVIRONMENT variable is required');
 
+        console.log(environment);
+        
+
         this.app = express();
     }
 
     async init() {
+        mongoose.connect(config.get('db.url'));
+        const database = mongoose.connection;
+
+        database.on('error', (error) => {
+            console.log(error)
+        });
+        
+        database.once('connected', () => {
+            console.log('Database Connected');
+        });
+
         this.app.use(cors());
         this.app.use(helmet());
         this.app.use(compression());
