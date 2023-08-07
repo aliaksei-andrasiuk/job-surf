@@ -1,9 +1,9 @@
 import { v4 } from 'node-uuid';
-import { SearchConfigModel } from '../models'
+import { SearchConfigsModel } from '../models'
 import { ICreateSearchConfig } from '../types';
 
 export const createSearchConfig = async (config: ICreateSearchConfig) => {
-    const data = new SearchConfigModel({
+    const data = new SearchConfigsModel({
         ...config,
         userId: v4()
     })

@@ -1,1 +1,1 @@
-export * from './client.route';
+export * from './searchConfig.route';

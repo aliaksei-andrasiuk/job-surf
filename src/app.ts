@@ -16,6 +16,7 @@ import * as operationHandlers from './routes';
 import errorMiddleware from './utils/error';
 import logger from './utils/logger';
 import getSpecUIMiddleware from './utils/spec-ui';
+import setUpTgBot from './services/telegram';
 
 export class App {
     private readonly app: express.Application;
@@ -24,9 +25,6 @@ export class App {
 
     constructor({ environment }: { environment?: string }) {
         assert(environment, 'ENVIRONMENT variable is required');
-
-        console.log(environment);
-        
 
         this.app = express();
     }
@@ -43,6 +41,8 @@ export class App {
             console.log('Database Connected');
         });
 
+        setUpTgBot();
+        
         this.app.use(cors());
         this.app.use(helmet());
         this.app.use(compression());

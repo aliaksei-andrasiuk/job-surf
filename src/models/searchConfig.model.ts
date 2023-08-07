@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const searchConfig = new mongoose.Schema({
+const searchConfigs = new mongoose.Schema({
     searchString: {
         type: String
     },
@@ -22,6 +22,4 @@ const searchConfig = new mongoose.Schema({
     }
 });
 
-const SearchConfigModel = mongoose.model('search-configs', searchConfig)
-
-export { SearchConfigModel }
+export const SearchConfigsModel = mongoose.model('search-configs', searchConfigs)

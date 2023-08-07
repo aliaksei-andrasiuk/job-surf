@@ -5,5 +5,6 @@
   "db": {
     "url": "MONGO_DB_URL"
   },
+  "tgToken": "TELEGRAM_TOKEN",
   "environment": "localhost"
 }
