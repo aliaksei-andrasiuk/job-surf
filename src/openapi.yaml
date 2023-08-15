@@ -1,7 +1,7 @@
 openapi: 3.0.1
 
 info:
-  title: Job serf API
+  title: Job surf API
   version: 1.0.0
 
 servers:
@@ -12,7 +12,7 @@ paths:
   /set-up-search-config:
     post:
       security:
-        - HubApiKeyAuth: []
+        - ApiKeyAuth: []
       summary: Set up search config
       tags:
         - SearchConfig
@@ -24,6 +24,8 @@ paths:
           $ref: '#/components/responses/genericResponse'
         400:
           $ref: '#/components/responses/error'
+        409:
+          $ref: '#/components/responses/error'
         500:
           $ref: '#/components/responses/error'
 
@@ -33,50 +35,169 @@ components:
       type: string
       format: uuid
 
-    email:
-      type: string
-      format: email
-
-    url:
-      type: string
-
-    searchString:
+    searchLine:
       type: string
       minLength: 0
       maxLength: 128
 
-    category:
+    justJoinItSeniorities:
       type: string
       enum:
-        - javascript
-        - ux
-
-    seniority:
-      type: string
-      enum:
-        - senior
-        - mid
+        - all
         - junior
+        - mid
+        - senior
+
+    noFluffJobsSeniorities:
+      type: string
+      enum:
+        - trainee
+        - junior
+        - mid
+        - senior
         - expert
 
-    seniorityArray:
-      type: array
-      items:
-        $ref: '#/components/schemas/seniority'
+    justJoinItCategories:
+      type: string
+      enum:
+        - all
+        - javascript
+        - html
+        - php
+        - ruby
+        - python
+        - java
+        - net
+        - scala
+        - c
+        - mobile
+        - testing
+        - devops
+        - admin
+        - ux
+        - pm
+        - game
+        - analytics
+        - security
+        - data
+        - go
+        - support
+        - erp
+        - architecture
+        - other
+    
+    noFluffJobsCategories:
+      type: string
+      enum:
+        - backend
+        - frontend
+        - fullstack
+        - mobile
+        - embedded
+        - testing
+        - devops
+        - architecture
+        - security
+        - gaming
+        - artificial-intelligence
+        - big-data
+        - it-administrator
+        - agile
+        - product-management
+        - project-manager
+        - business-intelligence
+        - business-analyst
+        - ux
+        - support
+        - erp
+        - electronics
+        - telecommunication
+        - electrical-eng
+        - automation
+        - robotics
+        - mechanics
+        - marketing
+        - backoffice
+        - hr
+        - finance
+        - consulting
+        - customer-service
+        - other
+    
+    noFluffJobsTechnologies:
+      type: string
+      enum:
+        - JavaScript
+        - .NET
+        - SQL
+        - Java
+        - Python
+        - React
+        - AWS
+        - TypeScript
+        - HTML
+        - Angular
+        - Azure
+        - PHP
+        - Android
+        - Kotlin
+        - Vue.js
+        - iOS
+        - Golang
+        - Spark
+        - Scala
+        - C
+        - Hadoop
+        - Ruby on Rails
+        - Ruby
+        - Flutter
+        - Elixir
+        - React native
+
+    justJoinItConfig:
+      type: object
+      properties:
+        searchLine:
+          $ref: '#/components/schemas/searchLine'
+        excludeSearchLine:
+          $ref: '#/components/schemas/searchLine'
+        category:
+          $ref: '#/components/schemas/justJoinItCategories'
+        seniorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/justJoinItSeniorities'
+      additionalProperties: false
+
+    noFluffJobsConfig:
+      type: object
+      properties:
+        searchLine:
+          $ref: '#/components/schemas/searchLine'
+        excludeSearchLine:
+          $ref: '#/components/schemas/searchLine'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/noFluffJobsCategories'
+        seniorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/noFluffJobsSeniorities'
+        technologies:
+          type: array
+          items:
+            $ref: '#/components/schemas/noFluffJobsTechnologies'
+      additionalProperties: false
 
     companyRating:
-      type: number
-      format: float
-      minimum: 1
-      maximum: 5
-
-  parameters:
-    clientID:
-      name: clientID
-      in: path
-      schema:
-        $ref: '#/components/schemas/uuid'
-      required: true
+      type: string
+      enum:
+        - "2.5"
+        - "3"
+        - "3.5"
+        - "4"
+        - "4.5"
 
   requestBodies:
     newConfig:
@@ -86,18 +207,14 @@ components:
           schema:
             type: object
             properties:
-              searchString:
-                $ref: '#/components/schemas/searchString'
-              category:
-                $ref: '#/components/schemas/category'
-              seniority:
-                $ref: '#/components/schemas/seniorityArray'
+              justJoinIt:
+                $ref: '#/components/schemas/justJoinItConfig'
+              noFluffJobs:
+                $ref: '#/components/schemas/noFluffJobsConfig'
               companyRating:
                 $ref: '#/components/schemas/companyRating'
-            required:
-              - category
-              - seniority
-              - companyRating
+              userId:
+                $ref: '#/components/schemas/uuid'
             additionalProperties: false
 
   responses:

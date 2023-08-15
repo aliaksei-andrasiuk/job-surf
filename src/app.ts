@@ -17,6 +17,7 @@ import errorMiddleware from './utils/error';
 import logger from './utils/logger';
 import getSpecUIMiddleware from './utils/spec-ui';
 import setUpTgBot from './services/telegram';
+import validateAuthorizationKey from './middlewares/validateAuthorizationKey';
 
 export class App {
     private readonly app: express.Application;
@@ -55,7 +56,9 @@ export class App {
             await getOpenAPIMiddleware({
                 operationHandlers,
                 apiSpecPath: './src/openapi.yaml',
-                securityHandlers: {},
+                securityHandlers: {
+                    ApiKeyAuth: validateAuthorizationKey,
+                },
             })
         );
         this.app.use(errorMiddleware);

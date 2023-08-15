@@ -1,3 +1,3 @@
 # README
 
-Bot to serf jobs
+Bot to surf jobs

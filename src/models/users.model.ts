@@ -5,7 +5,7 @@ const users = new mongoose.Schema({
         required: true,
         type: String
     },
-    userId: {
+    id: {
         required: true,
         type: String,
     }

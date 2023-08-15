@@ -1,3 +1,4 @@
+import { bot } from '../services/telegram/client';
 import handleError from './error/handleError';
 
 type TShutdown = () => Promise<void>;
@@ -28,6 +29,7 @@ export const handleException = (shutdown: TShutdown) => {
 
 export const handleShutdownSignals = (callback: TShutdown) => async (signal: NodeJS.Signals) => {
     try {
+        bot.stop(signal)
         await callback();
     } finally {
         process.kill(process.pid, signal);

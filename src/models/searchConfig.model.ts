@@ -1,20 +1,40 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const searchConfigs = new mongoose.Schema({
-    searchString: {
-        type: String
+const searchConfigs = new Schema({
+    justJoinIt: {
+        searchLine: {
+            type: String,
+        },
+        excludeSearchLine: {
+            type: String,
+        },
+        category: {
+            type: String,
+        },
+        seniorities: {
+            type: Array,
+        },
     },
-    category: {
-        required: true,
-        type: String
+    noFluffJobsConfig: {
+        searchLine: {
+            type: String,
+        },
+        excludeSearchLine: {
+            type: String,
+        },
+        categories: {
+            type: Array,
+        },
+        seniorities: {
+            type: Array,
+        },
+        technologies: {
+            type: Array,
+        },
     },
-    seniority: {
-        required: true,
-        type: Array,
-    },
+
     companyRating: {
-        required: true,
-        type: Number
+        type: Number,
     },
     userId: {
         required: true,
@@ -22,4 +42,4 @@ const searchConfigs = new mongoose.Schema({
     }
 });
 
-export const SearchConfigsModel = mongoose.model('search-configs', searchConfigs)
+export const SearchConfigsModel = model('search-configs', searchConfigs)

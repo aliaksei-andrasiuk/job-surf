@@ -1,9 +1,9 @@
 import { v4 } from 'node-uuid';
+import config from 'config';
 
 import { NarrowedContext, Context } from 'telegraf';
 import { Message, Update } from 'telegraf/typings/core/types/typegram';
-import { bot } from './client';
-import { UsersModel } from '../../models'
+import { UsersModel, SearchConfigsModel } from '../../models'
 
 type TCommandCallback = NarrowedContext<Context<Update>, {
     message: Update.New & Update.NonChannel & Message.TextMessage;
@@ -11,45 +11,89 @@ type TCommandCallback = NarrowedContext<Context<Update>, {
 }>
 
 export const start = async (ctx: TCommandCallback) => {
+    let user;
+
     try {
-        const user = await UsersModel.findOne({ tgId: ctx.from.id });
-
-        if (!!user) {
-            bot.telegram.sendMessage(ctx.chat.id, 'You have already started');
-
-            return
-        }
-
         if (ctx.from.is_bot) {
-            bot.telegram.sendMessage(ctx.chat.id, 'Sorry, it looks like you are bot. Please, become a human');
+            ctx.reply('Sorry, it looks like you are bot. Please, become a human');
 
             return
         }
 
-        const createUser = new UsersModel({
-            tgId: ctx.from.id,
-            userId: v4(),
-        });
+        user = await UsersModel.findOne({ tgId: ctx.from.id });
 
-        await createUser.save()
+        if (!user) {
+            user = new UsersModel({
+                tgId: ctx.from.id,
+                id: v4(),
+            });
+    
+            await user.save();
+        }
+
+        const searchConfigFormUrl = `${config.get('searchConfigFormUrl')}?userId=${user.id}`
+
+        ctx.reply(
+            'Let\'s get started 👨‍💻\n\nPlease open the app to set up surf config',
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ web_app: { url: searchConfigFormUrl }, text: 'Open job surf app',  }],
+                    ]
+                
+                }
+            }
+        )
+
     } catch (error) {
-        bot.telegram.sendMessage(ctx.chat.id, 'Sorry, something went wrong with adding a new user to the bot');
-
-        return
+        ctx.reply('Sorry, something went wrong with adding a new user to the bot');
     }
-
-
-    bot.telegram.sendMessage(ctx.chat.id, 'Hello there!')
 }
+
+export const stop = async (ctx: TCommandCallback) => {
+    try {
+        const existingUser = await UsersModel.findOne({ tgId: ctx.from.id });
+
+        if (!existingUser) {
+            ctx.reply('User not found');
+
+            return
+        }
+
+        const existingConfig = await SearchConfigsModel.findOne({ tgId: existingUser.id });
+
+        if (!existingConfig) {
+            ctx.reply('Search config not found');
+
+            return
+        }
+
+        await existingConfig.deleteOne();
+
+        ctx.reply('Search config has been removed');
+    } catch (error) {
+        ctx.reply('Sorry, something went wrong');
+    }
+}
+
+
 
 export const quit = async (ctx: TCommandCallback) => {
     try {
-        await UsersModel.deleteOne({ tgId: ctx.from.id });
-    } catch (error) {
-        bot.telegram.sendMessage(ctx.chat.id, 'Sorry, something went wrong');
-        return
-    }
+        const existingUser = await UsersModel.findOne({ tgId: ctx.from.id });
 
-    bot.telegram.sendMessage(ctx.chat.id, 'Bye!');
+        if (!existingUser) {
+            ctx.reply('User not found');
+
+            return
+        }
+
+        await existingUser.deleteOne();
+        await SearchConfigsModel.deleteOne({ userId: existingUser.id });
+
+        ctx.reply('Bye!\nHope I helped you');
+    } catch (error) {
+        ctx.reply('Sorry, something went wrong');
+    }
 }
 
